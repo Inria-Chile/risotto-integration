@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  risotto-backend:
+    container_name: risotto-backend-local
+    build:
+      context: ${RISOTTO_BACKEND_PATH}
+      dockerfile: Dockerfile-dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${RISOTTO_BACKEND_PATH}:/code
+      - ../artifacts:/code/artifacts
+  
+  risotto-frontend:
+    container_name: risotto-frontend-local
+    build:
+      context: ${RISOTTO_FRONTEND_PATH}
+      dockerfile: Dockerfile-dev
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${RISOTTO_FRONTEND_PATH}:/code
