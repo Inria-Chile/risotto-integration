@@ -46,10 +46,10 @@ services:
     build:
       context: ${RISOTTO_FRONTEND_PATH}
       dockerfile: Dockerfile
+      args:
+        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
     volumes:
       - frontend_static_files:/build
-    environment:
-      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
 
 volumes:
   frontend_static_files:
