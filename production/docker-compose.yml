@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=${BACKEND_PORT}
+      - SCRIPT_NAME=/api
     volumes:
       - ../artifacts:/code/artifacts
 
