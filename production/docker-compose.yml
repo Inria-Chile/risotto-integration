@@ -1,0 +1,54 @@
+
+version: "3.7"
+
+x-service: &service
+  logging:
+    driver: syslog
+    options:
+      syslog-address: "udp://logs2.papertrailapp.com:40015"
+      tag: "risotto-production {{.Name}}"
+
+services:
+  nginx:
+    image: smashwilson/lets-nginx
+    container_name: risotto-nginx-prod
+    restart: always
+    volumes:
+      - ./lets-nginx/cache:/cache
+      - ./lets-nginx/letsencrypt:/etc/letsencrypt
+      - ./nginx/risotto.inria.cl.conf:/configs/risotto.inria.cl.conf
+      - frontend_static_files:/frontend_static_files
+    environment:
+      - EMAIL=${LETS_ENCRYPT_EMAIL}
+      - DOMAIN=${LETS_ENCRYPT_DOMAIN}
+      - STAGING=${LETS_ENCRYPT_STAGING}
+      - UPSTREAM=risotto-backend:${BACKEND_PORT}
+    depends_on:
+      - risotto-backend
+      - risotto-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+
+  risotto-backend:
+    container_name: risotto-backend-prod
+    build:
+      context: ${RISOTTO_BACKEND_PATH}
+      dockerfile: Dockerfile
+    environment:
+      - PORT=${BACKEND_PORT}
+    volumes:
+      - ../artifacts:/code/artifacts
+
+  risotto-frontend:
+    container_name: risotto-frontend-prod
+    build:
+      context: ${RISOTTO_FRONTEND_PATH}
+      dockerfile: Dockerfile
+    volumes:
+      - frontend_static_files:/build
+    environment:
+      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
+
+volumes:
+  frontend_static_files:
